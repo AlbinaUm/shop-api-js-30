@@ -10,5 +10,11 @@
     "title": "New dish 2",
     "description": "Some test",
     "price": 200
+  },
+  {
+    "id": "61c99bf5-4aa2-4084-a1bb-6982a3638b68",
+    "title": "New item",
+    "description": "test",
+    "price": 500
   }
 ]
