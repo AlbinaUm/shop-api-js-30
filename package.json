@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "caesar-salad": "^2.1.0",
     "express": "^5.2.1"
   },
   "devDependencies": {

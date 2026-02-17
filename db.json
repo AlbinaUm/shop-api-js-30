@@ -1,0 +1,14 @@
+[
+  {
+    "id": "49663dc8-3551-4174-aa6d-a3d2d697c57d",
+    "title": "New dish",
+    "description": "Some test",
+    "price": 500
+  },
+  {
+    "id": "3482d0d2-b4af-4665-86b7-852f7312f641",
+    "title": "New dish 2",
+    "description": "Some test",
+    "price": 200
+  }
+]
