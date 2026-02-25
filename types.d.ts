@@ -3,6 +3,12 @@ export interface Product {
     title: string;
     price: number;
     description: string;
+    image: string | null;
 }
 
-export type ProductWithoutId = Omit<Product, 'id'>
+export interface ProductWithoutId {
+    title: string;
+    price: number;
+    description: string;
+    image: string | null;
+}
