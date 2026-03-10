@@ -23,7 +23,6 @@ const fileDb = {
     async addProduct(item: ProductWithoutId) {
         const id = crypto.randomUUID();
         const newProduct = {id, ...item};
-        data.push(newProduct);
         await this.save();
         return newProduct;
     },
