@@ -1,8 +1,6 @@
 import express from "express";
 import {Request, Response} from "express";
-import fileDb from "../fileDb";
 import {imagesUpload} from "../multer";
-import mysqlDb from "../mysqlDb";
 import {Product, ProductWithoutId} from "../types";
 
 const productsRouter = express.Router();
@@ -47,7 +45,6 @@ productsRouter.post('/', imagesUpload.single('image') , async (req: Request, res
     }
 
     const newProduct: ProductWithoutId = {
-        category_id: req.body.category_id,
         title: req.body.title,
         description: req.body.description || null,
         price: Number(req.body.price),
@@ -59,8 +56,8 @@ productsRouter.post('/', imagesUpload.single('image') , async (req: Request, res
         const connection = await mysqlDb.getConnection();
 
         const [result] = await connection.query(
-            'INSERT INTO products (category_id, title, description, price, image) VALUES (?, ?, ?, ?, ?)',
-            [newProduct.category_id, newProduct.title, newProduct.description, newProduct.price, newProduct.image]
+            'INSERT INTO products ( title, description, price, image) VALUES (?, ?, ?, ?, ?)',
+            [ newProduct.title, newProduct.description, newProduct.price, newProduct.image]
         );
 
         const resultHeader = result as {insertId: number};

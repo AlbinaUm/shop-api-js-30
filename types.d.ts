@@ -1,8 +1,5 @@
 export interface Product {
     id: string;
-    category: {
-        title: string
-    };
     title: string;
     price: number;
     description: string;
@@ -12,7 +9,6 @@ export interface Product {
 
 export interface ProductWithoutId {
     title: string;
-    category_id: number;
     price: number;
     description: string;
     image: string | null;
