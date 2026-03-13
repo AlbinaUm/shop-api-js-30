@@ -47,4 +47,14 @@ productsRouter.post('/', imagesUpload.single('image'),async (req, res, next) => 
     }
 })
 
+productsRouter.delete('/:id', async (req, res, next) => {
+    const {id} = req.params;
+    try {
+        await Product.findByIdAndDelete(id);
+        res.send({message: 'Product deleted successfully.'});
+    } catch (e) {
+        next(e);
+    }
+});
+
 export default productsRouter;
