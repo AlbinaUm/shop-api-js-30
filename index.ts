@@ -3,6 +3,7 @@ import productsRouter from "./routes/products";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import categoriesRouter from "./routes/categories";
 
 const app = express();
 const port = 8000;
@@ -14,6 +15,7 @@ app.use(express.json());
 
 
 app.use('/products', productsRouter);
+app.use('/categories', categoriesRouter);
 
 const run = async () => {
     await mongoose.connect('mongodb://localhost/shop-js-30');

@@ -8,7 +8,7 @@ const productsRouter = express.Router();
 
 productsRouter.get('/', async (req, res) => {
     try {
-        const products = await Product.find()
+        const products = await Product.find().populate("category");
         res.send(products);
     } catch (e) {
        res.sendStatus(500);
@@ -18,7 +18,7 @@ productsRouter.get('/', async (req, res) => {
 productsRouter.get('/:id', async (req, res) => {
     const {id} = req.params;
     try {
-        const product = await Product.findById(id);
+        const product = await Product.findById(id).populate("category");
         res.send(product);
     } catch (e) {
         res.sendStatus(500);
@@ -27,6 +27,7 @@ productsRouter.get('/:id', async (req, res) => {
 
 productsRouter.post('/', imagesUpload.single('image'),async (req, res, next) => {
     const newProduct: ProductWithoutId = {
+        category: req.body.category,
         title: req.body.title,
         description: req.body.description || null,
         price: Number(req.body.price),
