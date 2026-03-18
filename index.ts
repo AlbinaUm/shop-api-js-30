@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import categoriesRouter from "./routes/categories";
+import usersRouter from "./routes/users";
 
 const app = express();
 const port = 8000;
@@ -14,6 +15,7 @@ app.use(express.static('public'));
 app.use(express.json());
 
 
+app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);
 
