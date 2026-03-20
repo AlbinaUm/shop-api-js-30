@@ -13,7 +13,7 @@ export interface ProductWithoutId {
     title: string;
     price: number;
     description: string;
-    image: string | null;
+    images: string[] | null;
 }
 
 export interface Category {

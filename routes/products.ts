@@ -25,13 +25,15 @@ productsRouter.get('/:id', async (req, res) => {
     }
 });
 
-productsRouter.post('/', imagesUpload.single('image'),async (req, res, next) => {
+productsRouter.post('/', imagesUpload.array('images', 3),async (req, res, next) => {
+    const files = req.files as Express.Multer.File[];
+
     const newProduct: ProductWithoutId = {
         category: req.body.category,
         title: req.body.title,
         description: req.body.description || null,
         price: Number(req.body.price),
-        image: req.file ? 'images/' + req.file.filename : null,
+        images: files ? files.map(file =>'images/' + file.filename) : null,
     };
 
     try {

@@ -30,8 +30,8 @@ const ProductSchema = new Schema({
         min: [1, 'Price must be at least 1$'],
         required: true
     },
-    image: {
-        type: String,
+    images: {
+        type: [String],
         default: null
     }
 });
