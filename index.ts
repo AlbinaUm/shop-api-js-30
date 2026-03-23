@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import categoriesRouter from "./routes/categories";
 import usersRouter from "./routes/users";
+import config from "./config";
 
 const app = express();
 const port = 8000;
@@ -14,13 +15,12 @@ app.use(cors());
 app.use(express.static('public'));
 app.use(express.json());
 
-
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);
 
 const run = async () => {
-    await mongoose.connect('mongodb://localhost/shop-js-30');
+    await mongoose.connect(config.db);
 
     app.listen(port, () => {
         console.log("Server running on port " + port);

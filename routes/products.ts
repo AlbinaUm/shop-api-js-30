@@ -1,10 +1,16 @@
-import express from "express";
-import {imagesUpload} from "../multer";
+import express, {NextFunction, RequestHandler, Response} from "express";
+import {imagesUpload} from "../middleware/multer";
 import {ProductWithoutId} from "../types";
 import Product from "../models/Product";
 import {Error} from "mongoose";
+import auth, {RequestWithUser} from "../middleware/auth";
 
 const productsRouter = express.Router();
+
+productsRouter.get('/secret', auth, (req, res: Response, next: NextFunction) => {
+    const user = (req as RequestWithUser).user;
+    res.send({message: 'You have access to this secret message', username: user.username});
+});
 
 productsRouter.get('/', async (req, res) => {
     try {
