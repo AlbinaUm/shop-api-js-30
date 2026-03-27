@@ -11,8 +11,7 @@ const ProductSchema = new Schema({
         validate: {
             validator: async (categoryId: Types.ObjectId) => {
                const category =  await Category.findById(categoryId);
-                if (!category) return false;
-                return true;
+                return !!category;
             },
             message: 'Category does not exist',
         }

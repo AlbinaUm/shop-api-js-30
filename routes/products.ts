@@ -8,8 +8,12 @@ import auth, {RequestWithUser} from "../middleware/auth";
 const productsRouter = express.Router();
 
 productsRouter.get('/secret', auth, (req, res: Response, next: NextFunction) => {
-    const user = (req as RequestWithUser).user;
-    res.send({message: 'You have access to this secret message', username: user.username});
+    try {
+        const user = (req as RequestWithUser).user;
+        res.send({message: 'You have access to this secret message', username: user.username});
+    } catch (e) {
+        next(e);
+    }
 });
 
 productsRouter.get('/', async (req, res) => {

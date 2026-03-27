@@ -1,4 +1,4 @@
-import mongoose, {HydratedDocument, Model} from "mongoose";
+import mongoose, {HydratedDocument, Model, Document} from "mongoose";
 import bcrypt from "bcrypt";
 import {UserFields} from "../types";
 import {randomUUID} from "crypto";
@@ -32,6 +32,16 @@ const UserSchema = new mongoose.Schema<
     }
 });
 
+UserSchema.path('username').validate({
+    validator: async function (this: Document, value: string) {
+        if (!this.isModified('username')) return true;
+
+        const user = await User.findOne({ username: value });
+        return !user;
+    },
+    message: 'Username already exists. Please choose another one.'
+});
+
 UserSchema.methods.checkPassword = function (password: string) {
     return  bcrypt.compare(password, this.password);
 };
@@ -55,10 +65,6 @@ UserSchema.set('toJSON', {
        return rest;
    }
 });
-
-
-// Authentication (аутентификация) - передача личных данных (логин и пароль), который позволяет точно идентифицировать полз
-// Authorization (авторизация) - процесс ограничения доступа по различным частям системы, но здесь нужно залогиниться
 
 const User = mongoose.model('User', UserSchema);
 export default User;
