@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import {UserFields} from "../types";
 import jwt from 'jsonwebtoken';
 import config from "../config";
+import argon2 from "argon2";
 
 const SALT_WORK_FACTOR = 10;
 
@@ -43,21 +44,25 @@ UserSchema.path('username').validate({
     message: 'Username already exists. Please choose another one.'
 });
 
-UserSchema.methods.checkPassword = function (password: string) {
-    return  bcrypt.compare(password, this.password);
-};
-
 UserSchema.methods.generateAuthToken = function () {
     this.token = jwt.sign({_id: this._id}, config.jwtSecret, {expiresIn: '1m'});
 };
 
+UserSchema.methods.checkPassword = function (password: string) {
+    return argon2.verify(this.password, password);
+};
+
 UserSchema.pre('save', async function () {
     if (!this.isModified('password')) return;
-
-    const salt = await bcrypt.genSalt(SALT_WORK_FACTOR);
-    const hash = await bcrypt.hash(this.password, salt);
-
-    this.password = hash;
+    try {
+        this.password = await argon2.hash(this.password, {
+            type: argon2.argon2id,
+            memoryCost: 2 ** 16,
+            timeCost: 3,
+        });
+    } catch (e) {
+        throw new Error('Error hashing password');
+    }
 });
 
 UserSchema.set('toJSON', {
