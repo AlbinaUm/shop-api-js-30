@@ -1,11 +1,9 @@
 import mongoose, {HydratedDocument, Model, Document} from "mongoose";
-import bcrypt from "bcrypt";
 import {UserFields} from "../types";
 import jwt from 'jsonwebtoken';
 import config from "../config";
 import argon2 from "argon2";
 
-const SALT_WORK_FACTOR = 10;
 
 interface UserMethods {
     checkPassword: (password: string) => Promise<boolean>;
