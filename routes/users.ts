@@ -1,6 +1,9 @@
 import express from "express";
 import {Error} from "mongoose";
 import User from "../models/User";
+import jwt from "jsonwebtoken";
+import config from "../config";
+import auth, {RequestWithUser} from "../middleware/auth";
 
 const usersRouter = express.Router();
 
@@ -45,19 +48,8 @@ usersRouter.post('/sessions', async (req, res, next) => {
     }
 });
 
-usersRouter.get('/', async (req, res, next) => {
+usersRouter.get('/', auth, async (req, res, next) => {
     try {
-        const token = req.get('Authorization');
-        if (!token) {
-            return res.status(401).send({error: 'No token present'});
-        }
-
-        const user = await User.findOne({token});
-
-        if (!user) {
-            return res.status(401).send({error: 'Wrong token'});
-        }
-
         const users = await User.find();
         res.send(users);
     } catch (e) {
