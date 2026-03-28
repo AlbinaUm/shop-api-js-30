@@ -3,22 +3,16 @@ import {imagesUpload} from "../middleware/multer";
 import {ProductWithoutId} from "../types";
 import Product from "../models/Product";
 import {Error} from "mongoose";
-import auth, {RequestWithUser} from "../middleware/auth";
 
 const productsRouter = express.Router();
 
-productsRouter.get('/secret', auth, (req, res: Response, next: NextFunction) => {
-    try {
-        const user = (req as RequestWithUser).user;
-        res.send({message: 'You have access to this secret message', username: user.username});
-    } catch (e) {
-        next(e);
-    }
-});
-
 productsRouter.get('/', async (req, res) => {
     try {
-        const products = await Product.find().populate("category");
+        const query: {category?: string} = {};
+
+        if (req.query.category) query.category = req.query.category as string;
+
+        const products = await Product.find(query).populate("category");
         res.send(products);
     } catch (e) {
        res.sendStatus(500);
