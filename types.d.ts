@@ -10,6 +10,7 @@ export interface Product {
 
 export interface ProductWithoutId {
     category: string;
+    user: string;
     title: string;
     price: number;
     description: string;

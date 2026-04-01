@@ -28,7 +28,6 @@ const UserSchema = new mongoose.Schema<
     },
     token: {
        type: String,
-        required: true,
     }
 });
 
@@ -43,7 +42,7 @@ UserSchema.path('username').validate({
 });
 
 UserSchema.methods.generateAuthToken = function () {
-    this.token = jwt.sign({_id: this._id}, config.jwtSecret, {expiresIn: '1m'});
+    this.token = jwt.sign({_id: this._id}, config.jwtSecret, {expiresIn: '30d'});
 };
 
 UserSchema.methods.checkPassword = function (password: string) {
@@ -65,7 +64,7 @@ UserSchema.pre('save', async function () {
 
 UserSchema.set('toJSON', {
    transform: (_doc, ret, _options) => {
-       const { password, ...rest } = ret;
+       const { password, token, ...rest } = ret;
        return rest;
    }
 });

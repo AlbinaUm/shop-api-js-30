@@ -1,8 +1,6 @@
 import express from "express";
 import {Error} from "mongoose";
 import User from "../models/User";
-import jwt from "jsonwebtoken";
-import config from "../config";
 import auth, {RequestWithUser} from "../middleware/auth";
 
 const usersRouter = express.Router();
@@ -16,7 +14,15 @@ usersRouter.post('/', async (req, res, next) => {
 
         user.generateAuthToken();
 
-        await user.save();
+        const saveUser = await user.save();
+
+        res.cookie('token', saveUser.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict', // Защита от CSRF (Cross site request forgery),
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+        });
+
         res.send({message: 'User registered successfully', user});
     } catch (e) {
         if (e instanceof Error.ValidationError) {
@@ -41,20 +47,30 @@ usersRouter.post('/sessions', async (req, res, next) => {
         }
 
         user.generateAuthToken();
-        await user.save();
+        const userSave = await user.save();
+        res.cookie('token', userSave.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 дней
+        });
+
         res.send({message: 'Logged in successfully', user});
     } catch (e) {
         next(e);
     }
 });
 
-usersRouter.get('/', auth, async (req, res, next) => {
-    try {
-        const users = await User.find();
-        res.send(users);
-    } catch (e) {
-        next(e);
-    }
+usersRouter.delete('/sessions', auth, async (req, res, next) => {
+    const {user} = req as RequestWithUser;
+    user.token = '';
+    await user.save();
+
+    res.clearCookie('token', {
+        httpOnly: true,
+        sameSite: 'strict',
+    });
+    res.send({message: 'Logged out successfully'});
 });
 
 export default usersRouter;

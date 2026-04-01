@@ -3,6 +3,7 @@ import {imagesUpload} from "../middleware/multer";
 import {ProductWithoutId} from "../types";
 import Product from "../models/Product";
 import {Error} from "mongoose";
+import auth, {RequestWithUser} from "../middleware/auth";
 
 const productsRouter = express.Router();
 
@@ -12,7 +13,7 @@ productsRouter.get('/', async (req, res) => {
 
         if (req.query.category) query.category = req.query.category as string;
 
-        const products = await Product.find(query).populate("category");
+        const products = await Product.find(query).populate("category").populate("user", 'username');
         res.send(products);
     } catch (e) {
        res.sendStatus(500);
@@ -29,11 +30,13 @@ productsRouter.get('/:id', async (req, res) => {
     }
 });
 
-productsRouter.post('/', imagesUpload.array('images', 3),async (req, res, next) => {
+productsRouter.post('/', auth, imagesUpload.array('images', 3),async (req, res, next) => {
     const files = req.files as Express.Multer.File[];
+    const {user} = req as RequestWithUser;
 
     const newProduct: ProductWithoutId = {
         category: req.body.category,
+        user: user._id.toString(),
         title: req.body.title,
         description: req.body.description || null,
         price: Number(req.body.price),

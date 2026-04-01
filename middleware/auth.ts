@@ -2,7 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from "express";
 import {HydratedDocument} from "mongoose";
 import {UserFields} from "../types";
 import User from "../models/User";
-import jwt from "jsonwebtoken";
+import jwt, {TokenExpiredError} from "jsonwebtoken";
 import config from "../config";
 
 export interface RequestWithUser extends Request {
@@ -13,14 +13,15 @@ const auth: RequestHandler = async (expressReq: Request, res: Response, next: Ne
     try {
         const req = expressReq as RequestWithUser;
 
-        const token = req.get('Authorization')?.replace("Bearer ", '');
-        if (!token) {
+        const jwtToken = req.cookies.token;
+
+        if (!jwtToken) {
             return res.status(401).send({error: 'No token present'});
         }
 
-        const decoded = jwt.verify(token, config.jwtSecret) as {_id: string};
+        const decoded = jwt.verify(jwtToken, config.jwtSecret) as {_id: string};
 
-        const user = await User.findOne({_id: decoded._id, token});
+        const user = await User.findOne({_id: decoded._id, token: jwtToken});
 
         if (!user) {
             return res.status(401).send({error: 'Invalid token'});
@@ -30,7 +31,11 @@ const auth: RequestHandler = async (expressReq: Request, res: Response, next: Ne
         next();
     } catch (e) {
         console.log(e);
-        res.status(401).send({error: "Please authenticate"});
+        if (e instanceof  TokenExpiredError) {
+            return res.status(401).send({error: 'Your token expired'});
+        } else {
+            return res.status(401).send({error: "Please authenticate"});
+        }
     }
 };
 
