@@ -10,13 +10,17 @@ interface UserMethods {
     generateAuthToken: () => void;
 }
 
+interface UserVirtuals {
+    confirmPassword: string;
+}
+
 type UserModel = Model<UserFields, {}, UserMethods>;
 
 const UserSchema = new mongoose.Schema<
     HydratedDocument<UserFields>,
     UserModel,
     UserMethods,
-    {}>({
+    {}, UserVirtuals>({
    username: {
        type: String,
        required: true,
@@ -28,6 +32,17 @@ const UserSchema = new mongoose.Schema<
     },
     token: {
        type: String,
+    }
+}, {
+    virtuals: {
+        confirmPassword: {
+            get() {
+                return this.__confirmPassword
+            },
+            set(confirmPassword: string) {
+                this.__confirmPassword = confirmPassword;
+            }
+        }
     }
 });
 
@@ -49,8 +64,18 @@ UserSchema.methods.checkPassword = function (password: string) {
     return argon2.verify(this.password, password);
 };
 
+UserSchema.path('password').validate(function (currentPassword: string){
+    if (!this.isModified('password')) return;
+
+    if (currentPassword !== this.confirmPassword)  {
+        this.invalidate('confirmPassword', 'Passwords do not match');
+        this.invalidate('password', 'Passwords do not match');
+    }
+});
+
 UserSchema.pre('save', async function () {
     if (!this.isModified('password')) return;
+
     try {
         this.password = await argon2.hash(this.password, {
             type: argon2.argon2id,

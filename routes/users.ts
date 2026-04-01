@@ -7,9 +7,14 @@ const usersRouter = express.Router();
 
 usersRouter.post('/', async (req, res, next) => {
     try {
+        if (!req.body.confirmPassword) {
+            return res.status(400).send({error: 'Confirm password is required'});
+        }
+
         const user = new User({
             username: req.body.username,
             password: req.body.password,
+            confirmPassword: req.body.confirmPassword,
         });
 
         user.generateAuthToken();
