@@ -6,7 +6,6 @@ import mongoose from "mongoose";
 import categoriesRouter from "./routes/categories";
 import usersRouter from "./routes/users";
 import config from "./config";
-import tasksRouter from "./routes/tasks";
 import cookieParser from 'cookie-parser';
 
 const app = express();
@@ -24,7 +23,6 @@ app.use(express.json());
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);
-app.use('/tasks', tasksRouter);
 
 const run = async () => {
     await mongoose.connect(config.db);

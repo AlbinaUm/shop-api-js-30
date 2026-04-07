@@ -28,14 +28,37 @@ const run = async () => {
         }
     );
 
+    const admin = new User({
+        username: 'admin',
+        password: '123',
+        confirmPassword: '123',
+        role: 'admin',
+        token: '',
+    });
+
+    admin.generateAuthToken();
+    await admin.save()
+
+    const john = new User({
+        username: 'jone',
+        role: 'user',
+        password: '123',
+        confirmPassword: '123',
+        token: '',
+    });
+    john.generateAuthToken();
+    await john.save()
+
     await Product.create(
         {
+            user: admin._id,
             category: cpuCategory!._id,
             title: 'Intel Core i7',
             price: 350,
             images: ['fixtures/cpu.jpg'],
         },
         {
+            user: admin._id,
             category: ssdCategory!._id,
             title: 'Samsung 990 Pro 1Tb',
             price: 150,
@@ -43,16 +66,6 @@ const run = async () => {
         }
     );
 
-    await User.create({
-            username: 'admin',
-            password: '123',
-            token: randomUUID()
-        },
-        {
-            username: 'jone',
-            password: '123',
-            token: randomUUID()
-        });
 
     await db.close();
 };

@@ -4,6 +4,7 @@ import {ProductWithoutId} from "../types";
 import Product from "../models/Product";
 import {Error} from "mongoose";
 import auth, {RequestWithUser} from "../middleware/auth";
+import permit from "../middleware/permit";
 
 const productsRouter = express.Router();
 
@@ -30,20 +31,20 @@ productsRouter.get('/:id', async (req, res) => {
     }
 });
 
-productsRouter.post('/', auth, imagesUpload.array('images', 3),async (req, res, next) => {
-    const files = req.files as Express.Multer.File[];
-    const {user} = req as RequestWithUser;
-
-    const newProduct: ProductWithoutId = {
-        category: req.body.category,
-        user: user._id.toString(),
-        title: req.body.title,
-        description: req.body.description || null,
-        price: Number(req.body.price),
-        images: files ? files.map(file =>'images/' + file.filename) : null,
-    };
-
+productsRouter.post('/', auth, permit('admin') , imagesUpload.array('images', 3),async (req, res, next) => {
     try {
+        const files = req.files as Express.Multer.File[];
+        const {user} = req as RequestWithUser;
+
+        const newProduct: ProductWithoutId = {
+            category: req.body.category,
+            user: user._id.toString(),
+            title: req.body.title,
+            description: req.body.description || null,
+            price: Number(req.body.price),
+            images: files ? files.map(file =>'images/' + file.filename) : null,
+        };
+
         const product = new Product(newProduct);
         await product.save();
         res.send(product);
@@ -56,7 +57,7 @@ productsRouter.post('/', auth, imagesUpload.array('images', 3),async (req, res, 
     }
 })
 
-productsRouter.delete('/:id', async (req, res, next) => {
+productsRouter.delete('/:id', auth, permit('admin'), async (req, res, next) => {
     const {id} = req.params;
     try {
         await Product.findByIdAndDelete(id);
