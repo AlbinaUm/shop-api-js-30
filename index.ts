@@ -1,7 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from 'express'
 import productsRouter from "./routes/products";
 import cors from "cors";
-import dotenv from "dotenv";
 import mongoose from "mongoose";
 import categoriesRouter from "./routes/categories";
 import usersRouter from "./routes/users";
@@ -11,7 +13,7 @@ import cookieParser from 'cookie-parser';
 const app = express();
 const port = 8000;
 
-dotenv.config()
+
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true,

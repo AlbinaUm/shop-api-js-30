@@ -8,7 +8,7 @@ import permit from "../middleware/permit";
 
 const productsRouter = express.Router();
 
-productsRouter.get('/', async (req, res) => {
+productsRouter.get('/',auth, async (req, res) => {
     try {
         const query: {category?: string} = {};
 

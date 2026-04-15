@@ -13,18 +13,18 @@ const auth: RequestHandler = async (expressReq: Request, res: Response, next: Ne
     try {
         const req = expressReq as RequestWithUser;
 
-        const jwtToken = req.cookies.token;
+        const jwtToken = req.cookies.accessToken;
 
         if (!jwtToken) {
-            return res.status(401).send({error: 'No token present'});
+            return res.status(401).send({error: 'No access token present'});
         }
 
         const decoded = jwt.verify(jwtToken, config.jwtSecret) as {_id: string};
 
-        const user = await User.findOne({_id: decoded._id, token: jwtToken});
+        const user = await User.findOne({_id: decoded._id});
 
         if (!user) {
-            return res.status(401).send({error: 'Invalid token'});
+            return res.status(401).send({error: 'Invalid or expired access token'});
         }
 
         req.user = user;
@@ -34,7 +34,7 @@ const auth: RequestHandler = async (expressReq: Request, res: Response, next: Ne
         if (e instanceof  TokenExpiredError) {
             return res.status(401).send({error: 'Your token expired'});
         } else {
-            return res.status(401).send({error: "Please authenticate"});
+            return res.status(401).send({error: "Please authenticate. Invalid access token"});
         }
     }
 };

@@ -38,7 +38,9 @@ const UserSchema = new mongoose.Schema<
     },
     token: {
        type: String,
-    }
+    },
+    displayName: String,
+    googleID: String,
 }, {
     virtuals: {
         confirmPassword: {
