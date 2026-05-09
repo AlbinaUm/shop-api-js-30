@@ -9,6 +9,7 @@ import categoriesRouter from "./routes/categories";
 import usersRouter from "./routes/users";
 import config from "./config";
 import cookieParser from 'cookie-parser';
+import adminRouter from "./routes/admin";
 
 const app = express();
 const port = 8000;
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 app.use(express.json());
 
+app.use('/admin', adminRouter);
 app.use('/users', usersRouter);
 app.use('/products', productsRouter);
 app.use('/categories', categoriesRouter);

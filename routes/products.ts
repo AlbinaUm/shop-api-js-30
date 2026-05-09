@@ -8,7 +8,7 @@ import permit from "../middleware/permit";
 
 const productsRouter = express.Router();
 
-productsRouter.get('/',auth, async (req, res) => {
+productsRouter.get('/', async (req, res) => {
     try {
         const query: {category?: string} = {};
 
@@ -28,42 +28,6 @@ productsRouter.get('/:id', async (req, res) => {
         res.send(product);
     } catch (e) {
         res.sendStatus(500);
-    }
-});
-
-productsRouter.post('/', auth, permit('admin') , imagesUpload.array('images', 3),async (req, res, next) => {
-    try {
-        const files = req.files as Express.Multer.File[];
-        const {user} = req as RequestWithUser;
-
-        const newProduct: ProductWithoutId = {
-            category: req.body.category,
-            user: user._id.toString(),
-            title: req.body.title,
-            description: req.body.description || null,
-            price: Number(req.body.price),
-            images: files ? files.map(file =>'images/' + file.filename) : null,
-        };
-
-        const product = new Product(newProduct);
-        await product.save();
-        res.send(product);
-    } catch (error){
-        if (error instanceof Error.ValidationError) {
-            res.status(400).send(error);
-            return;
-        }
-      next(error);
-    }
-})
-
-productsRouter.delete('/:id', auth, permit('admin'), async (req, res, next) => {
-    const {id} = req.params;
-    try {
-        await Product.findByIdAndDelete(id);
-        res.send({message: 'Product deleted successfully.'});
-    } catch (e) {
-        next(e);
     }
 });
 
